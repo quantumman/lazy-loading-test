@@ -1,8 +1,8 @@
 //@flow
 
 import { combineReducers } from 'redux'
-import api from "./api";
+import animals from "./animals";
 
 export default combineReducers({
-  api
+  animals
 });

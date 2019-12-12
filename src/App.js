@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// @flow
 
-function App() {
+import React from 'react';
+import styled from 'styled-components';
+import type {Dog} from "./models/Dog";
+
+type Props = {
+  dogs: Dog[],
+}
+
+const S = {
+  Container: styled.div`
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-evenly;
+    align-content: flex-start;
+  `,
+  Content: styled.div`
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+  `
+};
+
+function App({dogs}: Props) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <S.Container>
+      <S.Content>
+        {dogs.map(dog => (<img src={dog.photoUrl} key={dog.id} alt={"Bow!"} />))}
+      </S.Content>
+    </S.Container>
   );
 }
 
