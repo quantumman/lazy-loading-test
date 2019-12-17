@@ -7,8 +7,9 @@ import App from "../App"
 import type { Dog } from "../models/Dog";
 import DogActions from "../action-dispatchers/Dog";
 import type {KeyedAsyncGenerator} from "../modules/animals";
+import type {Abort} from "../action-dispatchers/Dog";
 
-const useDogs = (): [ Array<KeyedAsyncGenerator<Dog>>, () => void, (string) => void ] => {
+const useDogs = (): [ Array<KeyedAsyncGenerator<Dog>>, () => Abort, (string) => void ] => {
   const dispatch = useDispatch();
   const dogss = useSelector(state => state.animals.dogss);
 
@@ -25,8 +26,9 @@ export default React.memo<{}>(() => {
   const [ dogss, forever, remove ] = useDogs();
 
   useEffect(() => {
-    forever();
+    const abort = forever();
+    return () => abort();
   }, []);
 
-  return <App dogss={dogss} onClickAdd={forever} onClickRemove={remove}/>;
+  return <App dogss={dogss} onClickAdd={() => { forever() }} onClickRemove={remove}/>;
 });

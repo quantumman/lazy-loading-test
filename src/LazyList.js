@@ -10,18 +10,20 @@ type Props<T: { id: string }> = {
 type Selector<T, U> = (source: T, index?: number) => U;
 
 function useAsyncGenerator<T: { id: string }>(it: AsyncGenerator<T, void, void>): T[] {
-  const ref = React.useRef<any>();
+  const isMounted = React.useRef(true);
   const [ items, setItems  ] = React.useState<T[]>([]);
 
-  ref.current = it;
   React.useEffect(() => {
     const timeout = setTimeout(async function () {
-      for await (const item of ref.current) {
-        setItems(is => [...is, item]);
+      for await (const item of it) {
+        if (isMounted.current) {
+          setItems(is => [...is, item]);
+        }
       }
     }, 0);
     return () => {
-      ref.current.return();
+      isMounted.current = false;
+      it.return();
       clearTimeout(timeout);
     }
   }, []);
