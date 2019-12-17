@@ -1,67 +1,78 @@
 // @flow
 
+import nanoid from "nanoid";
+
 import type {Dog} from "../models/Dog";
 
 // State
 
+export type KeyedAsyncGenerator<T> = {
+  items: AsyncGenerator<T, void, void>,
+  key: string,
+}
+
 type State = {
-  dogs: Dog[]
+  dogss: $ReadOnlyArray<KeyedAsyncGenerator<Dog>>;
 };
 
 const initialState: State = {
-  dogs: []
+  dogss: [],
 };
 
 // Action
 
-type FetchDogs = {|
-  type: "FETCH_DOGS",
-  payload: {
-    dogs: Dog[]
-  }
-|}
-
 type Append = {|
   type: "APPEND",
   payload: {
-    dog: Dog
+    dogs: AsyncGenerator<Dog, void, void>,
   }
 |};
 
-type Action = FetchDogs | Append;
+type Remove = {|
+  type: "REMOVE",
+  payload: {|
+    key: string
+  |}
+|};
 
-const FETCH_DOGS = "FETCH_DOGS";
+type Action = Append | Remove;
+
 const APPEND = "APPEND";
+const REMOVE = "REMOVE";
 
 export const actions = {
-  fetchDogs: (dogs: Dog[]): FetchDogs => ({
-    type: FETCH_DOGS,
+  append: (dogs: AsyncGenerator<Dog, void, void>): Append => ({
+    type: APPEND,
     payload: {
       dogs
     }
   }),
-  append: (dog: Dog): Append => ({
-    type: APPEND,
+  remove: (key: string): Remove => ({
+    type: REMOVE,
     payload: {
-      dog
+      key,
     }
-  }),
+  })
 };
 
 // Reducer
 
-export default (state: State = initialState, action: Action) => {
+export default (state: State = initialState, action: Action): State => {
   switch (action.type) {
-    case FETCH_DOGS: {
-      return {
-        ...state,
-        dogs: [ ...action.payload.dogs ],
-      }
-    }
     case APPEND: {
+      const dogs = {
+        items: action.payload.dogs,
+        key: nanoid(),
+      };
       return {
         ...state,
-        dogs: [ ...state.dogs, action.payload.dog ],
+        dogss: [ ...state.dogss, dogs ],
+      };
+    }
+    case REMOVE: {
+      return {
+        ...state,
+        dogss: state.dogss.filter((dogs) => dogs.key !== action.payload.key),
       }
     }
     default:

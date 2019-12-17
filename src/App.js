@@ -3,22 +3,25 @@
 import React from 'react';
 import styled from 'styled-components';
 import type {Dog} from "./models/Dog";
+import LazyList from "./LazyList";
+import type {KeyedAsyncGenerator} from "./modules/animals";
 
 type Props = {
-  dogs: Dog[],
-  onClickStart: () => void,
-  onClickStop: () => void,
+  dogss: Array<KeyedAsyncGenerator<Dog>>,
+  onClickAdd: () => void,
+  onClickRemove: (string) => void,
 }
 
 const S = {
   Container: styled.div`
+    position: relative;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     align-content: flex-start;
   `,
   Content: styled.div`
-    width: 100%;
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -32,18 +35,37 @@ const S = {
     width: 7em;
     height: 5em;
   `,
+  AddButton: styled.button`
+    position: fixed;
+    top: 2em;
+    left: 10em;
+    width: 7em;
+    height: 5em;   
+  `,
+  Img: styled.img`
+    width: 10em;
+    height: 10em;
+  `,
 };
 
-function App({dogs, onClickStart, onClickStop}: Props) {
+function App({dogss, onClickAdd, onClickRemove}: Props) {
   return (
     <S.Container>
-      <S.Content>
-        {dogs.map(dog => (<img src={dog.photoUrl} key={dog.id} alt={"Bow!"} />))}
-      </S.Content>
-      <S.ButtonGroup>
-        <S.Button onClick={onClickStart}>Start</S.Button>
-        <S.Button onClick={onClickStop}>Stop</S.Button>
-      </S.ButtonGroup>
+      {dogss
+        .map(({items, key}) => (
+          <S.Content key={key}>
+            <LazyList
+              items={items}
+            >
+              {dog => (<S.Img src={dog.photoUrl} key={dog.id} alt={"Bow!"}/>)}
+            </LazyList>
+            <S.ButtonGroup>
+              <S.Button onClick={() => onClickRemove(key)}>Remove {key}</S.Button>
+            </S.ButtonGroup>
+          </S.Content>
+        ))
+      }
+      <S.AddButton onClick={onClickAdd}>Add</S.AddButton>
     </S.Container>
   );
 }

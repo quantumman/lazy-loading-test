@@ -8,5 +8,5 @@ export interface Dog {
 
 export interface DogRepo {
   retrieve: () => Promise<Dog[]>,
-  forever: () => AsyncIterable<Dog>
+  forever: () => AsyncGenerator<Dog, void, void>
 }

@@ -9,8 +9,8 @@ const repo: DogRepo = {
     const { message } = await response.json();
     return [{ id: nanoid(), photoUrl: message }];
   },
-  forever: async function*(): AsyncIterable<Dog> {
-    const count = 9999999;
+  forever: async function*(): AsyncGenerator<Dog, void, void> {
+    const count = 99999999;
 
     for (let i = 0; i < count; i++) {
       const response = await fetch("https://dog.ceo/api/breeds/image/random");
