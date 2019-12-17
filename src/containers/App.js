@@ -8,22 +8,25 @@ import type { Dog } from "../models/Dog";
 import DogActions from "../action-dispatchers/Dog";
 
 
-const useDogs = (): [ Dog[], () => Promise<void> ] => {
+const useDogs = (): [ Dog[], () => void, () => void ] => {
   const dispatch = useDispatch();
   const dogs = useSelector(state => state.animals.dogs);
 
   const dog = useMemo(() => DogActions(dispatch, dogs), [dispatch, dogs]);
   const forever = useCallback(() => dog.forever(), [dog]);
+  const stop =   useCallback(() => {
+    dog.stop();
+  }, [dog]);
 
-  return [dogs, forever];
+  return [dogs, forever, stop];
 }
 
 export default React.memo<{}>(() => {
-  const [ dogs, forever ] = useDogs();
+  const [ dogs, forever, stop ] = useDogs();
 
   useEffect(() => {
     forever();
   }, []);
 
-  return <App dogs={dogs} />;
+  return <App dogs={dogs} onClickStart={forever} onClickStop={stop} />;
 });
